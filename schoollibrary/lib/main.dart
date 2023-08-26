@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:schoollibrary/src/BLOC/SnackBar_noimage/snackbar_bloc_bloc.dart';
+import 'package:schoollibrary/src/BLOC/bloc/update_booktype_bloc.dart';
 // import 'package:schoollibrary/src/BLOC/bloc/book_type_edit_bloc.dart';
 import 'package:schoollibrary/src/BLOC/bookImage_bloc/bookimage_bloc.dart';
 import 'package:schoollibrary/src/BLOC/booktype_editbloc1_bloc/booktype_editbloc1_bloc.dart';
@@ -59,6 +60,9 @@ class MyApp extends StatelessWidget {
     final editbook2Bloc = BlocProvider<Editbook2Bloc>(
       create: (context) => Editbook2Bloc(),
     );
+    final updateBooktypeBloc = BlocProvider<UpdateBooktypeBloc>(
+      create: (context) => UpdateBooktypeBloc(),
+    );
 
     return MultiBlocProvider(
       providers: [
@@ -67,7 +71,8 @@ class MyApp extends StatelessWidget {
         imagePikerBooktypeBloc,
         snackbarBlocBloc,
         BooktypeEditbloc1Bloc1,
-        editbook2Bloc
+        editbook2Bloc,
+        updateBooktypeBloc
 
         // imageBooktype
       ],

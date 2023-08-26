@@ -8,12 +8,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker_windows/image_picker_windows.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:schoollibrary/src/BLOC/bloc/update_booktype_bloc.dart';
 import 'package:schoollibrary/src/BLOC/editbook2/editbook2_bloc.dart';
 import 'package:schoollibrary/src/constant/getBook_type.dart';
 import 'package:schoollibrary/src/constant/getbook.dart';
 import 'package:schoollibrary/src/model/book_model.dart';
 import 'package:schoollibrary/src/model/book_type.dart';
 import 'package:schoollibrary/src/screen/Excel_export/export_excel.dart';
+import 'package:schoollibrary/src/screen/bookType_dialog.dart';
 import 'package:schoollibrary/src/util/getbooImage.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:mime/mime.dart';
@@ -99,16 +101,25 @@ class _BookAllState extends State<BookAll> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              IconButton(
-                                  tooltip: 'รายละเอียด',
-                                  onPressed: () {
-                                    editbook(context, data[index]);
-                                  },
-                                  icon: const Icon(
-                                    Icons.edit_note,
-                                    size: 30,
-                                    color: Colors.blue,
-                                  )),
+                              ValueListenableBuilder(
+                                valueListenable:
+                                    getBookType.gettype().listenable(),
+                                builder: (context, box, _) {
+                                  List<BookType> booktype =
+                                      box.values.toList().cast<BookType>();
+                                  return IconButton(
+                                      tooltip: 'รายละเอียด',
+                                      onPressed: () {
+                                        editbook(
+                                            context, data[index], booktype);
+                                      },
+                                      icon: const Icon(
+                                        Icons.edit_note,
+                                        size: 30,
+                                        color: Colors.blue,
+                                      ));
+                                },
+                              ),
                               const SizedBox(
                                 width: 15,
                               ),
@@ -179,7 +190,8 @@ class _BookAllState extends State<BookAll> {
     await data.delete();
   }
 
-  Future<dynamic> editbook(BuildContext context, Bookmodel books) {
+  Future<dynamic> editbook(
+      BuildContext context, Bookmodel books, List<BookType> booktype) {
     TextEditingController booktypes = TextEditingController();
     TextEditingController booknames = TextEditingController();
     TextEditingController images = TextEditingController();
@@ -195,7 +207,7 @@ class _BookAllState extends State<BookAll> {
     dtails.text = books.dtail.toString();
     Authors.text = books.Author.toString();
     bookscodes.text = books.bookcode.toString();
-
+    inspect(booktype);
     return showDialog(
       context: context,
       builder: (context) {
@@ -315,26 +327,17 @@ class _BookAllState extends State<BookAll> {
                                     const SizedBox(
                                       height: 10,
                                     ),
-                                    ValueListenableBuilder(
-                                      valueListenable:
-                                          getBookType.gettype().listenable(),
-                                      builder: (context, box, _) {
-                                        List<BookType> typeData = box.values
-                                            .toList()
-                                            .cast<BookType>();
-                                        return DropdownButtonFormField(
-                                          onChanged: (value) {},
-                                          items: typeData
-                                              .map((e) => DropdownMenuItem(
-                                                    child: Text(
-                                                      e.bookname.toString(),
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                          decoration:
-                                              bookinputStyle(lable: 'ตัวย่อ'),
-                                        );
+
+                                    BookTypeDialog(),
+                                    BlocListener<UpdateBooktypeBloc,
+                                        UpdateBooktypeState>(
+                                      listener: (context, state) {
+                                        print(123);
+                                        if (state is UpdateBooktypeState) {
+                                          print(state.booktype);
+                                        }
                                       },
+                                      child: Container(),
                                     ),
 
                                     const SizedBox(
@@ -424,10 +427,6 @@ class _BookAllState extends State<BookAll> {
 
     File curentiimg = File('${Dir}/image/$imageCurent');
     File NewImage = File(newImagePath);
-
-    print(imageCurent);
-    print(newImagePath);
-    print(newname);
 
     final imageAdd = await NewImage.copy('${Dir}/image/$newname');
     imageAdd.path;
