@@ -20,11 +20,11 @@ class _BookTypeDialogState extends State<BookTypeDialog> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: getBookType.gettype().listenable(),
-      builder: (context, box, _) {
+      builder: (ctx, box, _) {
         List<BookType> data = box.values.toList().cast<BookType>();
         return DropdownButtonFormField(
           decoration: const InputDecoration(
-            label: Text(''),
+            label: Text('หมวด(ไม่บังคับ)'),
             border: OutlineInputBorder(
               borderSide: BorderSide(width: 2),
             ),
@@ -38,11 +38,9 @@ class _BookTypeDialogState extends State<BookTypeDialog> {
                   ))
               .toList(),
           onChanged: (String? value) {
-            widget.booktypedata = value;
-
             context
                 .read<UpdateBooktypeBloc>()
-                .add(UpdateBooktypeEvent(booktype: 'dvdsvsdvs'));
+                .add(UpdateBooktypeEvent(booktype: value.toString()));
           },
         );
       },

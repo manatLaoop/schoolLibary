@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -53,6 +54,7 @@ class _BookAllState extends State<BookAll> {
           builder: (context, box, _) {
             List<Bookmodel> data = box.values.toList().cast<Bookmodel>();
 
+            // List<Bookmodel> test =  Book.boxes().
             return ListView.builder(
               shrinkWrap: true,
               reverse: true,
@@ -207,7 +209,7 @@ class _BookAllState extends State<BookAll> {
     dtails.text = books.dtail.toString();
     Authors.text = books.Author.toString();
     bookscodes.text = books.bookcode.toString();
-    inspect(booktype);
+
     return showDialog(
       context: context,
       builder: (context) {
@@ -329,13 +331,11 @@ class _BookAllState extends State<BookAll> {
                                     ),
 
                                     BookTypeDialog(),
+
                                     BlocListener<UpdateBooktypeBloc,
                                         UpdateBooktypeState>(
                                       listener: (context, state) {
-                                        print(123);
-                                        if (state is UpdateBooktypeState) {
-                                          print(state.booktype);
-                                        }
+                                        if (state is UpdateBooktypeState) {}
                                       },
                                       child: Container(),
                                     ),
@@ -343,9 +343,29 @@ class _BookAllState extends State<BookAll> {
                                     const SizedBox(
                                       height: 10,
                                     ),
-                                    TextFormField(
-                                      controller: bookscodes,
-                                      decoration: bookinputStyle(lable: 'รหัส'),
+                                    ValueListenableBuilder(
+                                      valueListenable:
+                                          Book.boxes().listenable(),
+                                      builder: (context, box, _) {
+                                        List<Book> databooks =
+                                            box.values.toList().cast<Book>();
+                                        return BlocListener<UpdateBooktypeBloc,
+                                            UpdateBooktypeState>(
+                                          listener: (context, state) {
+                                            if (state is UpdateBooktypeState) {
+                                              String code =
+                                                  '${state.booktype}-${databooks.length}${Random().nextInt(10000)}';
+                                              bookscodes.text = code;
+                                            }
+                                          },
+                                          child: TextFormField(
+                                            enabled: false,
+                                            controller: bookscodes,
+                                            decoration:
+                                                bookinputStyle(lable: 'รหัส'),
+                                          ),
+                                        );
+                                      },
                                     ),
 
                                     const SizedBox(
@@ -359,6 +379,7 @@ class _BookAllState extends State<BookAll> {
                                     const SizedBox(
                                       height: 10,
                                     ),
+
                                     TextFormField(
                                       controller: Authors,
                                       decoration:
